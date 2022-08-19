@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Auth;
+use Laravel\Horizon\Horizon;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -14,6 +16,9 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         //
+        if (app()->isLocal()) {
+            $this->app->register(\VIACreative\SudoSu\ServiceProvider::class);
+        }
     }
 
     /**
@@ -29,5 +34,10 @@ class AppServiceProvider extends ServiceProvider
 
         //
         \Illuminate\Pagination\Paginator::useBootstrap();
+
+        Horizon::auth(function ($request) {
+            // 是否是站长
+            return Auth::user()->hasRole('Founder');
+        });
     }
 }
